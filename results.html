@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Audit Results — AuditLab</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M3 21V9l6-4 6 4v12M9 21v-6h6v6M15 9l6-4v16" stroke="#07090f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="logo-text">AuditLab</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="audit.html" class="nav-cta">New Audit</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container container-sm">
+  <div class="results-header">
+    <span class="badge"><span class="badge-dot"></span>Audit Complete</span>
+    <h1>Your Marketing Audit</h1>
+    <p id="industryLine">Personalized for your business</p>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="action-row">
+    <a href="audit.html" class="btn btn-ghost">Run Another Audit</a>
+    <button class="btn" onclick="copyShareLink()">Copy Shareable Link</button>
+    <button class="btn btn-ghost" onclick="window.print()">Download / Print</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Link copied to clipboard ✓</div>
+
+<footer><div class="container">© 2026 AuditLab</div></footer>
+
+<script>
+  const CPL = {
+    instagram: { min: 0.8, max: 3.0, name: "Instagram" },
+    facebook:  { min: 1.0, max: 4.0, name: "Facebook" },
+    google:    { min: 2.0, max: 8.0, name: "Google Ads" },
+    tiktok:    { min: 0.5, max: 2.0, name: "TikTok" }
+  };
+
+  const INDUSTRY_NAME = {
+    ecommerce: "E-commerce / Retail",
+    education: "Education / Online courses",
+    services: "Services",
+    restaurant: "Restaurant / F&B",
+    realestate: "Real Estate",
+    healthcare: "Healthcare",
+    beauty: "Beauty / Salon",
+    fitness: "Fitness / Wellness",
+    saas: "SaaS / Tech",
+    finance: "Finance / Insurance",
+    travel: "Travel / Tourism",
+    manufacturing: "Manufacturing / B2B",
+    consulting: "Consulting / Coaching",
+    automotive: "Automotive",
+    construction: "Construction",
+    other: "Other"
+  };
+
+  const INDUSTRY_TIPS = {
+    ecommerce: "Use catalog ads & retargeting — product views convert well with dynamic creatives.",
+    education: "Lead magnets (free webinars, trial lessons) work best. Long funnels convert higher.",
+    services: "Focus on case studies and testimonials — trust drives B2B/service conversions.",
+    restaurant: "Geo-target ads within a 3-5 km radius + limited-time offers to drive foot traffic.",
+    realestate: "High-ticket = longer funnel. Video tours + WhatsApp/Telegram lead forms work well.",
+    healthcare: "Build trust with doctor profiles. Google Search intent outperforms social for bookings.",
+    beauty: "Before/after content + influencer UGC on Instagram & TikTok drives bookings.",
+    fitness: "Free trial / 7-day challenge funnels convert best. Community content keeps CAC low.",
+    saas: "Free trial + product demos. Google Search for high-intent + LinkedIn for B2B.",
+    finance: "Compliance-safe creatives. Google Search dominates — high CPL but high intent.",
+    travel: "Visual storytelling on Instagram/TikTok. Retarget website visitors heavily.",
+    manufacturing: "LinkedIn + Google Search. Long sales cycle — nurture with email sequences.",
+    consulting: "Personal brand content + lead magnets. Webinars convert premium clients.",
+    automotive: "Local targeting + Facebook Marketplace-style ads. Test-drive offers work well.",
+    construction: "Before/after projects + local reviews. Google Local Services Ads for lead gen.",
+    other: "Test multiple angles — creative variety matters more than budget at the start."
+  };
+
+  const SOCIAL_LABEL = { excellent: "Excellent", good: "Good", weak: "Weak", none: "None" };
+
+  // Support URL params (shareable link) or sessionStorage
+  function getData() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('r')) {
+      return {
+        owner: params.get('o') || 'yes',
+        crm: params.get('c') || 'no',
+        sales: params.get('s') || 'no',
+        social: params.get('so') || 'good',
+        industry: params.get('i') || 'other',
+        platform: params.get('p') || 'instagram',
+        revenue: params.get('r'),
+        check: params.get('ch') || '60',
+        conversion: params.get('cv') || '30'
+      };
+    }
+    const raw = sessionStorage.getItem('auditData');
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  const data = getData();
+  if (!data) { window.location.href = 'audit.html'; }
+
+  const revenue = parseFloat(data.revenue);
+  const check = parseFloat(data.check);
+  const conversion = parseFloat(data.conversion) / 100;
+
+  const customersNeeded = Math.ceil(revenue / check);
+  const leadsNeeded = Math.ceil(customersNeeded / conversion);
+  const impressionsNeeded = leadsNeeded * 50;
+
+  const cpl = CPL[data.platform];
+  const minBudget = Math.round(leadsNeeded * cpl.min);
+  const maxBudget = Math.round(leadsNeeded * cpl.max);
+  const optimalBudget = Math.round((minBudget + maxBudget) / 2);
+
+  let riskScore = 0;
+  const warnings = [];
+  if (data.crm === 'no') { riskScore += 2; warnings.push("<strong>No CRM</strong> — you're losing leads through the cracks (~20% wasted ad spend)"); }
+  if (data.sales === 'no') { riskScore += 2; warnings.push("<strong>No sales team</strong> — owner bottleneck limits scale (~20% missed conversions)"); }
+  if (data.social === 'weak' || data.social === 'none') { riskScore += 1; warnings.push("<strong>Weak social presence</strong> — ads will convert worse without social proof"); }
+
+  let multiplier = 1;
+  if (data.crm === 'no') multiplier += 0.2;
+  if (data.sales === 'no') multiplier += 0.2;
+  const realBudget = Math.round(optimalBudget * multiplier);
+
+  // Score calculation: 100 - (riskScore * 15) - (social penalty)
+  let score = 100 - (riskScore * 15);
+  if (data.social === 'weak') score -= 5;
+  if (data.social === 'none') score -= 10;
+  if (data.social === 'good') score -= 2;
+  if (data.social === 'excellent') score += 0;
+  score = Math.max(10, Math.min(100, score));
+
+  let grade, gradeColor, gradeMsg;
+  if (score >= 90) { grade = "A+"; gradeColor = "var(--success)"; gradeMsg = "Excellent setup. You're positioned to scale aggressively."; }
+  else if (score >= 80) { grade = "A"; gradeColor = "var(--success)"; gradeMsg = "Strong foundation. Minor tweaks will unlock bigger results."; }
+  else if (score >= 70) { grade = "B"; gradeColor = "var(--primary)"; gradeMsg = "Solid base with room to grow. Focus on the gaps below."; }
+  else if (score >= 60) { grade = "C"; gradeColor = "var(--warning)"; gradeMsg = "Fixable gaps are costing you. Tackle the warnings first."; }
+  else if (score >= 40) { grade = "D"; gradeColor = "var(--warning)"; gradeMsg = "Significant issues will drain your budget. Fix before scaling."; }
+  else { grade = "F"; gradeColor = "var(--danger)"; gradeMsg = "Critical gaps. Running paid ads now will waste most of your spend."; }
+
+  let risk, riskClass;
+  if (riskScore >= 4) { risk = "High"; riskClass = "tag-risk-high"; }
+  else if (riskScore >= 2) { risk = "Medium"; riskClass = "tag-risk-medium"; }
+  else { risk = "Low"; riskClass = "tag-risk-low"; }
+
+  const tips = [];
+  if (data.crm === 'no') tips.push("Set up a CRM (HubSpot Free, Pipedrive, or Zoho) — this alone saves ~20% of your budget.");
+  if (data.sales === 'no') tips.push("Hire a sales manager once leads exceed what you can personally handle (~50+/month).");
+  if (data.social === 'weak' || data.social === 'none') tips.push("Post 3-5x per week and pin top social proof before scaling ad spend.");
+  tips.push("Start with a <strong>test budget</strong> ($" + Math.round(minBudget * 0.3).toLocaleString() + "–$" + Math.round(minBudget * 0.5).toLocaleString() + ") for 7-14 days to validate CPL before scaling.");
+  tips.push(INDUSTRY_TIPS[data.industry]);
+
+  document.getElementById('industryLine').textContent = INDUSTRY_NAME[data.industry] + ' · ' + cpl.name;
+
+  // Build funnel stages (widths relative to impressions)
+  const maxWidth = 100;
+  const impW = maxWidth;
+  const leadW = Math.max(30, (leadsNeeded / impressionsNeeded) * 100 * 3);
+  const custW = Math.max(15, (customersNeeded / impressionsNeeded) * 100 * 3);
+
+  const html = `
+    <div class="score-hero">
+      <div class="score-ring">
+        <svg width="140" height="140">
+          <circle class="score-ring-bg" cx="70" cy="70" r="60" stroke-width="10"/>
+          <circle class="score-ring-fill" cx="70" cy="70" r="60" stroke-width="10"
+            stroke="${gradeColor}"
+            stroke-dasharray="376.99"
+            stroke-dashoffset="376.99"
+            id="scoreRingFill"/>
+        </svg>
+        <div class="score-text">
+          <div class="score-grade" style="color: ${gradeColor};">${grade}</div>
+          <div class="score-label">Score <span id="scoreNum">0</span></div>
+        </div>
+      </div>
+      <div class="score-info">
+        <h2>Your marketing readiness</h2>
+        <p>${gradeMsg}</p>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="result-card-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Business Health
+        </div>
+        <div class="result-row"><span class="label">CRM system</span><span class="tag ${data.crm === 'yes' ? 'tag-yes' : 'tag-no'}">${data.crm === 'yes' ? 'Yes' : 'No'}</span></div>
+        <div class="result-row"><span class="label">Sales team</span><span class="tag ${data.sales === 'yes' ? 'tag-yes' : 'tag-no'}">${data.sales === 'yes' ? 'Yes' : 'Owner only'}</span></div>
+        <div class="result-row"><span class="label">Social presence</span><span class="value">${SOCIAL_LABEL[data.social]}</span></div>
+        <div class="result-row"><span class="label">Risk level</span><span class="tag ${riskClass}">${risk}</span></div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-card-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+          Financial Goal
+        </div>
+        <div class="result-row"><span class="label">Monthly target</span><span class="value">$${revenue.toLocaleString()}</span></div>
+        <div class="result-row"><span class="label">Average check</span><span class="value">$${check.toLocaleString()}</span></div>
+        <div class="big-stat">
+          <div class="num" data-count="${customersNeeded}">0</div>
+          <div class="desc">customers needed per month</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-card" style="margin-bottom: 16px;">
+      <div class="result-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18M7 14l4-4 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Your Funnel
+      </div>
+      <div class="funnel-chart">
+        <div class="funnel-stage">
+          <div class="funnel-bar" style="width: ${impW}%; opacity: 0.5;">
+            <span class="stage-label">Impressions (est.)</span>
+            <span class="stage-num">~${impressionsNeeded.toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="funnel-arrow">↓</div>
+        <div class="funnel-stage">
+          <div class="funnel-bar" style="width: ${leadW}%; opacity: 0.8;">
+            <span class="stage-label">Leads</span>
+            <span class="stage-num">${leadsNeeded.toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="funnel-arrow">↓ ${(conversion * 100).toFixed(0)}% convert</div>
+        <div class="funnel-stage">
+          <div class="funnel-bar" style="width: ${custW}%;">
+            <span class="stage-label">Customers</span>
+            <span class="stage-num">${customersNeeded.toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="funnel-arrow">↓ × $${check} avg check</div>
+        <div class="funnel-stage">
+          <div class="funnel-bar" style="width: ${custW}%; background: var(--gradient-warm);">
+            <span class="stage-label">Revenue</span>
+            <span class="stage-num">$${revenue.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-card" style="margin-bottom: 16px;">
+      <div class="result-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Ad Budget Breakdown — ${cpl.name}
+      </div>
+      <div class="result-row"><span class="label">Cost per lead (CPL)</span><span class="value">$${cpl.min} – $${cpl.max}</span></div>
+
+      <div class="budget-chart">
+        <div class="budget-row">
+          <div class="budget-row-head"><span class="label">Minimum (best-case CPL)</span><span class="amount">$${minBudget.toLocaleString()}</span></div>
+          <div class="budget-bar-bg"><div class="budget-bar-fill min" data-width="${(minBudget/Math.max(realBudget,maxBudget))*100}"></div></div>
+        </div>
+        <div class="budget-row">
+          <div class="budget-row-head"><span class="label"><strong>Optimal budget</strong></span><span class="amount" style="color: var(--primary);">$${optimalBudget.toLocaleString()}</span></div>
+          <div class="budget-bar-bg"><div class="budget-bar-fill optimal" data-width="${(optimalBudget/Math.max(realBudget,maxBudget))*100}"></div></div>
+        </div>
+        ${multiplier > 1 ? `
+        <div class="budget-row">
+          <div class="budget-row-head"><span class="label">Real budget (risk +${Math.round((multiplier-1)*100)}%)</span><span class="amount" style="color: var(--warning);">$${realBudget.toLocaleString()}</span></div>
+          <div class="budget-bar-bg"><div class="budget-bar-fill real" data-width="100"></div></div>
+        </div>` : ''}
+      </div>
+    </div>
+
+    ${warnings.length ? `
+    <div class="result-card" style="margin-bottom: 16px;">
+      <div class="result-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.8L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.8a2 2 0 00-3.4 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Warnings
+      </div>
+      ${warnings.map(w => `<div class="alert alert-warning"><span class="alert-icon">⚠️</span><span>${w}</span></div>`).join('')}
+      ${multiplier > 1 ? `<div class="alert alert-warning"><span class="alert-icon">💸</span><span>Without fixing these, your real budget will be <strong>~${Math.round((multiplier - 1) * 100)}% higher</strong> than optimal.</span></div>` : ''}
+    </div>` : ''}
+
+    <div class="result-card">
+      <div class="result-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Recommendations
+      </div>
+      ${tips.map((t, i) => `<div class="alert alert-success"><span class="alert-icon"><strong>${i + 1}.</strong></span><span>${t}</span></div>`).join('')}
+    </div>
+  `;
+
+  document.getElementById('results').innerHTML = html;
+
+  // Animations
+  setTimeout(() => {
+    const ring = document.getElementById('scoreRingFill');
+    const circumference = 2 * Math.PI * 60;
+    const offset = circumference - (score / 100) * circumference;
+    ring.style.strokeDashoffset = offset;
+
+    // Count up score
+    const scoreNum = document.getElementById('scoreNum');
+    let start = 0;
+    const duration = 1200;
+    const stepTime = 20;
+    const inc = score / (duration / stepTime);
+    const counter = setInterval(() => {
+      start += inc;
+      if (start >= score) { scoreNum.textContent = score; clearInterval(counter); }
+      else { scoreNum.textContent = Math.round(start); }
+    }, stepTime);
+
+    // Count big stats
+    document.querySelectorAll('.big-stat .num[data-count]').forEach(el => {
+      const target = parseInt(el.dataset.count);
+      let s = 0;
+      const ic = target / (duration / stepTime);
+      const c = setInterval(() => {
+        s += ic;
+        if (s >= target) { el.textContent = target.toLocaleString(); clearInterval(c); }
+        else { el.textContent = Math.round(s).toLocaleString(); }
+      }, stepTime);
+    });
+
+    // Animate budget bars
+    document.querySelectorAll('.budget-bar-fill').forEach(el => {
+      el.style.width = el.dataset.width + '%';
+    });
+  }, 150);
+
+  // Shareable link
+  window.copyShareLink = function() {
+    const params = new URLSearchParams({
+      o: data.owner, c: data.crm, s: data.sales, so: data.social,
+      i: data.industry, p: data.platform,
+      r: data.revenue, ch: data.check, cv: data.conversion
+    });
+    const url = window.location.origin + window.location.pathname + '?' + params.toString();
+    navigator.clipboard.writeText(url).then(() => {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    });
+  };
+</script>
+
+</body>
+</html>

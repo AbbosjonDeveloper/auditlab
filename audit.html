@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Audit — AuditLab</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M3 21V9l6-4 6 4v12M9 21v-6h6v6M15 9l6-4v16" stroke="#07090f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="logo-text">AuditLab</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html">← Back to home</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container container-sm audit-wrap">
+  <div class="audit-header">
+    <h1>Marketing Audit</h1>
+    <p>9 quick questions — takes under a minute</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">1/9</div>
+  </div>
+
+  <form id="auditForm" class="card">
+
+    <div class="wizard-step active" data-step="1">
+      <span class="step-emoji">👋</span>
+      <h2 class="step-title">Are you the business owner?</h2>
+      <p class="step-desc">This helps us tailor advice to your role.</p>
+      <div class="radio-group">
+        <input type="radio" name="owner" id="owner-yes" value="yes" checked>
+        <label for="owner-yes">Yes, I own it</label>
+        <input type="radio" name="owner" id="owner-no" value="no">
+        <label for="owner-no">No, I work there</label>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="2">
+      <span class="step-emoji">📋</span>
+      <h2 class="step-title">Do you have a CRM system?</h2>
+      <p class="step-desc">HubSpot, Bitrix24, AmoCRM, Pipedrive, etc.</p>
+      <div class="radio-group">
+        <input type="radio" name="crm" id="crm-yes" value="yes">
+        <label for="crm-yes">Yes</label>
+        <input type="radio" name="crm" id="crm-no" value="no" checked>
+        <label for="crm-no">No</label>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="3">
+      <span class="step-emoji">👥</span>
+      <h2 class="step-title">Do you have a dedicated sales team?</h2>
+      <p class="step-desc">People whose only job is handling incoming leads.</p>
+      <div class="radio-group">
+        <input type="radio" name="sales" id="sales-yes" value="yes">
+        <label for="sales-yes">Yes, managers</label>
+        <input type="radio" name="sales" id="sales-no" value="no" checked>
+        <label for="sales-no">No, I sell myself</label>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="4">
+      <span class="step-emoji">📱</span>
+      <h2 class="step-title">How's your social media presence?</h2>
+      <p class="step-desc">Ads convert better with strong social proof.</p>
+      <div class="options-grid">
+        <input type="radio" name="social" id="social-excellent" value="excellent">
+        <label for="social-excellent"><span class="option-icon">🔥</span>Excellent</label>
+        <input type="radio" name="social" id="social-good" value="good" checked>
+        <label for="social-good"><span class="option-icon">👍</span>Good</label>
+        <input type="radio" name="social" id="social-weak" value="weak">
+        <label for="social-weak"><span class="option-icon">😐</span>Weak</label>
+        <input type="radio" name="social" id="social-none" value="none">
+        <label for="social-none"><span class="option-icon">🚫</span>None</label>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="5">
+      <span class="step-emoji">🏢</span>
+      <h2 class="step-title">What industry are you in?</h2>
+      <p class="step-desc">We'll match you with the right playbook.</p>
+      <select name="industry">
+        <option value="ecommerce">E-commerce / Retail</option>
+        <option value="education">Education / Online courses</option>
+        <option value="services">Services (agency, freelance)</option>
+        <option value="restaurant">Restaurant / Food & Beverage</option>
+        <option value="realestate">Real Estate</option>
+        <option value="healthcare">Healthcare / Medical</option>
+        <option value="beauty">Beauty / Salon / Cosmetics</option>
+        <option value="fitness">Fitness / Gym / Wellness</option>
+        <option value="saas">SaaS / Tech / Software</option>
+        <option value="finance">Finance / Insurance</option>
+        <option value="travel">Travel / Tourism</option>
+        <option value="manufacturing">Manufacturing / B2B</option>
+        <option value="consulting">Consulting / Coaching</option>
+        <option value="automotive">Automotive</option>
+        <option value="construction">Construction / Home services</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="wizard-step" data-step="6">
+      <span class="step-emoji">🎯</span>
+      <h2 class="step-title">Primary ad platform?</h2>
+      <p class="step-desc">Where do you plan to run most of your ads?</p>
+      <div class="options-grid">
+        <input type="radio" name="platform" id="p-instagram" value="instagram" checked>
+        <label for="p-instagram"><span class="option-icon">📸</span>Instagram</label>
+        <input type="radio" name="platform" id="p-facebook" value="facebook">
+        <label for="p-facebook"><span class="option-icon">👥</span>Facebook</label>
+        <input type="radio" name="platform" id="p-google" value="google">
+        <label for="p-google"><span class="option-icon">🔍</span>Google Ads</label>
+        <input type="radio" name="platform" id="p-tiktok" value="tiktok">
+        <label for="p-tiktok"><span class="option-icon">🎵</span>TikTok</label>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="7">
+      <span class="step-emoji">💰</span>
+      <h2 class="step-title">Monthly revenue goal?</h2>
+      <p class="step-desc">In USD. How much do you want to make per month?</p>
+      <input type="number" name="revenue" min="100" value="10000" placeholder="10000" required>
+    </div>
+
+    <div class="wizard-step" data-step="8">
+      <span class="step-emoji">💵</span>
+      <h2 class="step-title">Average check?</h2>
+      <p class="step-desc">How much does a typical customer pay you?</p>
+      <input type="number" name="check" min="1" value="60" placeholder="60" required>
+    </div>
+
+    <div class="wizard-step" data-step="9">
+      <span class="step-emoji">📊</span>
+      <h2 class="step-title">Sales conversion rate?</h2>
+      <p class="step-desc">What % of leads become paying customers?</p>
+      <input type="number" name="conversion" min="1" max="100" value="30" placeholder="30" required>
+    </div>
+
+    <div class="wizard-nav">
+      <button type="button" class="btn btn-ghost" id="backBtn" disabled>← Back</button>
+      <button type="button" class="btn" id="nextBtn">Next →</button>
+      <button type="submit" class="btn" id="submitBtn" style="display: none;">Get My Audit ✨</button>
+    </div>
+  </form>
+</div>
+
+<footer><div class="container">© 2026 AuditLab</div></footer>
+
+<script>
+  const steps = document.querySelectorAll('.wizard-step');
+  const totalSteps = steps.length;
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const form = document.getElementById('auditForm');
+
+  let current = 1;
+
+  function render() {
+    steps.forEach(s => s.classList.remove('active'));
+    document.querySelector(`.wizard-step[data-step="${current}"]`).classList.add('active');
+    progressFill.style.width = (current / totalSteps * 100) + '%';
+    progressLabel.textContent = `${current}/${totalSteps}`;
+    backBtn.disabled = current === 1;
+    if (current === totalSteps) {
+      nextBtn.style.display = 'none';
+      submitBtn.style.display = 'inline-flex';
+    } else {
+      nextBtn.style.display = 'inline-flex';
+      submitBtn.style.display = 'none';
+    }
+    const firstInput = document.querySelector(`.wizard-step[data-step="${current}"] input, .wizard-step[data-step="${current}"] select`);
+    if (firstInput && firstInput.type === 'number') setTimeout(() => firstInput.focus(), 100);
+  }
+
+  function validateCurrent() {
+    const stepEl = document.querySelector(`.wizard-step[data-step="${current}"]`);
+    const inputs = stepEl.querySelectorAll('input, select');
+    for (const inp of inputs) {
+      if (inp.type === 'number' && (!inp.value || inp.value <= 0)) {
+        inp.focus();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (!validateCurrent()) return;
+    if (current < totalSteps) { current++; render(); }
+  });
+
+  backBtn.addEventListener('click', () => {
+    if (current > 1) { current--; render(); }
+  });
+
+  // Enter key to go next
+  form.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && current < totalSteps) {
+      e.preventDefault();
+      nextBtn.click();
+    }
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!validateCurrent()) return;
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+    sessionStorage.setItem('auditData', JSON.stringify(data));
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Analyzing...';
+    setTimeout(() => { window.location.href = 'results.html'; }, 400);
+  });
+
+  render();
+</script>
+
+</body>
+</html>
