@@ -999,11 +999,32 @@ input::placeholder { color: hsl(var(--muted-foreground)); }
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* Focus states (keyboard accessibility) */
+.btn:focus-visible,
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+}
+.radio-group input[type="radio"]:focus-visible + label,
+.options-grid input[type="radio"]:focus-visible + label {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+}
+a:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.faq-q:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -2px;
+}
+
 /* Responsive */
 @media (max-width: 700px) {
   .nav { padding: 0 16px; }
   .nav-links { gap: 12px; }
-  .nav-links a:not(.nav-cta):not(.theme-toggle) { display: none; }
+  .nav-links .nav-hide-mobile { display: none; }
   .hero { padding: 56px 0 40px; }
   .section { padding: 56px 0; }
   .card { padding: 20px; }

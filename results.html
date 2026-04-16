@@ -133,7 +133,10 @@
   }
 
   const data = getData();
-  if (!data) { window.location.href = 'audit.html'; }
+  if (!data) {
+    window.location.href = 'audit.html';
+    throw new Error('No audit data — redirecting');
+  }
 
   const revenue = parseFloat(data.revenue);
   const check = parseFloat(data.check);
@@ -199,9 +202,8 @@
         <svg width="120" height="120">
           <circle class="score-ring-bg" cx="60" cy="60" r="52" stroke-width="8"/>
           <circle class="score-ring-fill" cx="60" cy="60" r="52" stroke-width="8"
-            stroke="${gradeColor}"
+            style="stroke: ${gradeColor}; stroke-dashoffset: 326.73;"
             stroke-dasharray="326.73"
-            stroke-dashoffset="326.73"
             id="scoreRingFill"/>
         </svg>
         <div class="score-text">
